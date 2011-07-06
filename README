@@ -1,0 +1,5 @@
+--Razor Wire Alpha--
+
+This currently won't build for anyone.
+Depends on DejaVu fonts and stuff that I'm not sure I can include here.
+Also currently has no makefile.. Need to learn how to use them.

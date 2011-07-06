@@ -6,6 +6,7 @@
 
 enum control_list {W, S, A, D, Up, Down, Left, Right};
 
+
 class Camera : public Object {
 public:
     Camera(Point, Point);

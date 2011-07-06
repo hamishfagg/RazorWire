@@ -1,0 +1,12 @@
+-- Installation --
+
+These aren't actually installation instructions since no install target is in the makefile yet - joke's on you.
+
+Razor Wire depends on OpenGL and SMFL - Have these installed.
+
+After that type these commands:
+
+cd /path/to/RazorWire/
+make
+
+Done. An executable 'RazorWire' will be in the current dir if all goes well.

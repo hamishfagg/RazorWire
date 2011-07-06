@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <math.h>
 
+
 Player::Player(std::deque<Point>::reverse_iterator tp) : controls({sf::Key::W,
                              sf::Key::S,
                              sf::Key::A,

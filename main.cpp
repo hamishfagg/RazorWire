@@ -14,6 +14,7 @@
 
 #define PI 3.14159265
 
+
 void getPipe(int n, char* s) {
     int i;
     for (i = 0; i < n; ++i) {

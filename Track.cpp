@@ -4,6 +4,7 @@
 #include <iostream>
 #include <time.h>
 
+
 Track::Track() : lastRot( {0,0})
 {
     track.push_front(Point(0,0,0));

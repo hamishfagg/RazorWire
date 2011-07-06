@@ -1,5 +1,6 @@
 --Razor Wire Alpha--
 
-This currently won't build for anyone.
-Depends on DejaVu fonts and stuff that I'm not sure I can include here.
-Also currently has no makefile.. Need to learn how to use them.
+Razor Wire is a fun and simple game where you score points based on how close you are to a line drawn in 3D space.
+This is by no means finished - it was the product of a 48-hour game design competition that is now being worked on for fun.
+
+Read INSTALL for installation instructions.

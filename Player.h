@@ -1,7 +1,9 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 
+#include <deque>
 #include <SFML/Window.hpp>
+#include <SFML/OpenGL.hpp>
 #include "Object.h"
 
 enum control_list {W, S, A, D, Up, Down, Left, Right};

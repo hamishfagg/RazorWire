@@ -22,7 +22,7 @@ void getPipe(int n, char* s) {
     for (i = 0; i < n; ++i) {
         if (i < n) s[i] = '|';
     }
-    s[i] = NULL;
+    s[i] = '\0';
 }
 
 // Sets up the graphics environment
@@ -120,8 +120,10 @@ int main(int argc, char* argv[])
 
     // Create the main window
     sf::RenderWindow App(sf::VideoMode(1000, 1000, 32), "Razor Wire");
-    //App.UseVerticalSync(true);
-    App.PreserveOpenGLStates(true);
+
+    App.EnableVerticalSync(true);
+    App.SetFramerateLimit(60);
+    //App.PreserveOpenGLStates(true);
 
     sf::Clock Clock;
 
@@ -136,7 +138,7 @@ int main(int argc, char* argv[])
 		double time = Clock.GetElapsedTime();
 		track.GenChunk(TRACK_LENGTH);
 		time = Clock.GetElapsedTime() - time;
-		std::cout << "Level generated in " << time << " seconds." << std::endl;
+		std::cout << "Level generated in " << time << " milliseconds." << std::endl;
 		
 		std::cout << "Setting up track preview...";
 	}
@@ -170,18 +172,18 @@ int main(int argc, char* argv[])
             glLoadIdentity();
 			
             gluLookAt(max + 100, 0, 0, 0, 0, 0, 0, 0, 1); 			// Look at the origin, from a large x distance away
-            glRotatef(Clock.GetElapsedTime()*30, 1, 0, 0);		// Rotate on all 3 axis at different speeds
-            glRotatef(Clock.GetElapsedTime()*40, 0, 1, 0);
-            glRotatef(Clock.GetElapsedTime()*50, 0, 0, 1);
+            glRotatef((double)Clock.GetElapsedTime()/1000*30, 1, 0, 0);		// Rotate on all 3 axis at different speeds
+            glRotatef((double)Clock.GetElapsedTime()/1000*40, 0, 1, 0);
+            glRotatef((double)Clock.GetElapsedTime()/1000*50, 0, 0, 1);
             glTranslatef(-trackAvg.x, -trackAvg.y, -trackAvg.z);	// Translate the avg track pos
 
-            track.Render(App.GetFrameTime(), 1.0); 				// Render the track all pretty and such
+            track.Render((double)App.GetFrameTime()/1000, 1.0); 				// Render the track all pretty and such
 
             App.Display();
 			
             // Process events
             sf::Event Event;
-            while (App.GetEvent(Event))
+            while (App.PollEvent(Event))
             {
                 // Close window : exit
                 if ((Event.Type == sf::Event::Closed) |
@@ -203,15 +205,15 @@ int main(int argc, char* argv[])
             // hack alert
             char s[80];
             getPipe(20 - p.trackDist(p.tp), pipetext);
-            if (debug)	sprintf(s, "%f\n%i\n%s", 1/App.GetFrameTime(), (int)p.score, pipetext); // Add a frame rate counter if we're in debug mode
+            if (debug)	sprintf(s, "%f\n%i\n%s", 1/((double)App.GetFrameTime()/1000), (int)p.score, pipetext); // Add a frame rate counter if we're in debug mode
 			else			sprintf(s, "%i\n%s", (int)p.score, pipetext);
-            sf::String Text(s);
+            sf::Text Text(s);
 
             Text.SetColor(sf::Color(255,255,255));
 
             // Process events
             sf::Event Event;
-            while (App.GetEvent(Event))
+            while (App.PollEvent(Event))
             {
                 // Close window : exit
                 if ((Event.Type == sf::Event::Closed) |
@@ -300,10 +302,12 @@ int main(int argc, char* argv[])
                 glVertex3f(p.r.x, p.r.y, p.r.z);
             glEnd();
 
-            track.Render(App.GetFrameTime(), 0.2); // Render track and player
-            p.Render(App.GetFrameTime());
+            track.Render((double)App.GetFrameTime()/1000, 0.2); // Render track and player
+            p.Render((double)App.GetFrameTime()/1000);
 
+            App.SaveGLStates();
             App.Draw(Text);	// Draw HUD text
+            App.RestoreGLStates();
 
             //------------
 
@@ -313,7 +317,7 @@ int main(int argc, char* argv[])
 	else if (state == 4) // Game is paused
 	{
 		sf::Event Event;
-		while (App.GetEvent(Event))
+		while (App.PollEvent(Event))
 		{
 			// Close window : exit
 			if ((Event.Type == sf::Event::Closed) |

@@ -125,7 +125,9 @@ int main(int argc, char* argv[])
 
     sf::Clock Clock;
 
+	if (debug) std::cout << "Setting up graphics...";
     setupGraphics(); // Located above main()
+	if (debug) std::cout << "done." << std::endl;
 
     // Initialise track
     Track track;
@@ -136,7 +138,7 @@ int main(int argc, char* argv[])
 		time = Clock.GetElapsedTime() - time;
 		std::cout << "Level generated in " << time << " seconds." << std::endl;
 		
-		std::cout << "Setting up track preview" << std::endl;
+		std::cout << "Setting up track preview...";
 	}
 	else
 	{
@@ -155,6 +157,8 @@ int main(int argc, char* argv[])
     state = 2; // Preview
 
 	glMatrixMode(GL_MODELVIEW);
+	
+	if (debug) std::cout << "done." << std::endl;
 	
 	// Start the game loop
     while (App.IsOpened())
@@ -219,7 +223,10 @@ int main(int argc, char* argv[])
 				
 				// Pause
 				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::P)
+				{
 					state = 4;
+					if (debug) std::cout << "The game has been paused." << std::endl;
+				}
             }
 
             if (in.IsKeyDown(p.controls[A])) {
@@ -317,6 +324,7 @@ int main(int argc, char* argv[])
 			if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::P)
 			{
 				state = 3;
+				if (debug) std::cout << "The game has been resumed." << std::endl;
 			}
 
 			if (Event.Type == sf::Event::Resized)

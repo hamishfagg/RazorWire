@@ -121,9 +121,8 @@ int main(int argc, char* argv[])
     // Create the main window
     sf::RenderWindow App(sf::VideoMode(1000, 1000, 32), "Razor Wire");
 
-    App.EnableVerticalSync(true);
-    App.SetFramerateLimit(60);
-    //App.PreserveOpenGLStates(true);
+    //App.EnableVerticalSync(true);
+    //App.SetFramerateLimit(60);
 
     sf::Clock Clock;
 

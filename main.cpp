@@ -20,7 +20,7 @@
 void getPipe(int n, char* s) {
     int i;
     for (i = 0; i < n; ++i) {
-        if (i < n) s[i] = '|';
+        s[i] = '|';
     }
     s[i] = '\0';
 }
@@ -152,7 +152,6 @@ int main(int argc, char* argv[])
     // Initialise player
     Player p(track.getStart());
 
-    const sf::Input &in = App.GetInput();
     char pipetext[80]; // hacks
 	
     state = 2; // Preview
@@ -186,11 +185,11 @@ int main(int argc, char* argv[])
             {
                 // Close window : exit
                 if ((Event.Type == sf::Event::Closed) |
-                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Escape))
+                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Escape))
                     App.Close();
 
                 // Start track
-				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Return)
+				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Return)
                     state = 3;
 
                 if (Event.Type == sf::Event::Resized)
@@ -216,42 +215,42 @@ int main(int argc, char* argv[])
             {
                 // Close window : exit
                 if ((Event.Type == sf::Event::Closed) |
-                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Escape))
+                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Escape))
                     App.Close();
 
                 if (Event.Type == sf::Event::Resized)
                     glViewport(0, 0, Event.Size.Width, Event.Size.Height);
 				
 				// Pause
-				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::P)
+				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::P)
 				{
 					state = 4;
 					if (debug) std::cout << "The game has been paused." << std::endl;
 				}
             }
 
-            if (in.IsKeyDown(p.controls[A])) {
+            if (sf::Keyboard::IsKeyPressed(p.controls[A])) {
                 p.rv.z = -1;
             }
-            else if (in.IsKeyDown(p.controls[D])) {
+            else if (sf::Keyboard::IsKeyPressed(p.controls[D])) {
                 p.rv.z = 1;
             }
             else {
                 p.rv.z = 0;
             }
-            if (in.IsKeyDown(p.controls[Left])) {
+            if (sf::Keyboard::IsKeyPressed(p.controls[Left])) {
                 p.rv.y = 1;
             }
-            else if (in.IsKeyDown(p.controls[Right])) {
+            else if (sf::Keyboard::IsKeyPressed(p.controls[Right])) {
                 p.rv.y = -1;
             }
             else {
                 p.rv.y = 0;
             }
-            if (in.IsKeyDown(p.controls[Up])) {
+            if (sf::Keyboard::IsKeyPressed(p.controls[Up])) {
                 p.rv.x = -1;
             }
-            else if (in.IsKeyDown(p.controls[Down])) {
+            else if (sf::Keyboard::IsKeyPressed(p.controls[Down])) {
                 p.rv.x = 1;
             }
             else {
@@ -320,11 +319,11 @@ int main(int argc, char* argv[])
 		{
 			// Close window : exit
 			if ((Event.Type == sf::Event::Closed) |
-				(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Escape))
+				(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Escape))
 				App.Close();
 
 			// Unpause
-			if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::P)
+			if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::P)
 			{
 				state = 3;
 				if (debug) std::cout << "The game has been resumed." << std::endl;

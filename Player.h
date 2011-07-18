@@ -24,8 +24,8 @@ public:
     void Render(float);
     double score;
     // Controls (Follows control_list order)
-    sf::Key::Code GetControls(control_list);
-    sf::Key::Code controls[8];
+    sf::Keyboard::Key GetControls(control_list);
+    sf::Keyboard::Key controls[8];
 private:
 
 };

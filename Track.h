@@ -1,6 +1,6 @@
 #ifndef TRACK_H_INCLUDED
 #define TRACK_H_INCLUDED
-#include <queue>
+#include <deque>
 #include <SFML/Window.hpp>
 
 #include "Object.h"
@@ -17,7 +17,7 @@ public:
     std::deque<Point>::reverse_iterator getStart();
 private:
     void ExtendTrack(Point);
-
+    GLUquadricObj *quadratic;
     float SEGMENT_LENGTH;
     std::deque<Point> track;
     float lastRot[2];

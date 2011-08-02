@@ -13,6 +13,7 @@
 #include "Track.h"
 
 #define PI 3.14159265
+#define DEAD_ZONE 30
 
 
 // Returns n pipes in a string
@@ -86,7 +87,7 @@ void setupGraphics()
     gluPerspective(75.f, 1.f, 1.f, 1000.f); //This needs to be set to a shorter value after track preview
 }
 
-// Main method 
+// Main method
 // Should the main game loop  / operations be in it's own class to save this for arg parsing and stuff?
 int main(int argc, char* argv[])
 {
@@ -101,14 +102,33 @@ int main(int argc, char* argv[])
     {
         if (strcmp(argv[i], "--debug") == 0)
         {
-			std::cout << "DEBUG ENABLED: This could cause lower framerates than normal, and should NOT be used by default." << std::endl;
-            debug = true;
+          std::cout << "DEBUG ENABLED: This could cause lower framerates than normal, and should NOT be used by default." << std::endl;
+          debug = true;
         }
         if (strcmp(argv[i], "-s") == 0)
         {
             i++;
             seed = coll.hash(argv[i], argv[i]+strlen(argv[i]));
-			if (debug) std::cout << "Seeding with " << seed << "..." << std::endl;
+            if (debug) std::cout << "Seeding with " << seed << "..." << std::endl;
+        }
+        if ((strcmp(argv[i], "-j") == 0) || (strcmp(argv[i], "--joystick") == 0))
+        {
+          std::cout << "JOY" << std::endl;
+          sf::Joystick::Update();
+          for (int i = 0; i < sf::Joystick::Count; i++)
+          {
+            if (sf::Joystick::IsConnected(i))
+            {
+              joystick = true;
+              joy_id = i;
+              if (debug) std::cout << "Found joystick " << i << std::endl;
+              break;
+            }
+            else
+            {
+              std::cout << i << " is not connected." << std::endl;
+            }
+          }
         }
     }
 
@@ -138,7 +158,7 @@ int main(int argc, char* argv[])
 		track.GenChunk(TRACK_LENGTH);
 		time = Clock.GetElapsedTime() - time;
 		std::cout << "Level generated in " << time << " milliseconds." << std::endl;
-		
+
 		std::cout << "Setting up track preview...";
 	}
 	else
@@ -153,22 +173,23 @@ int main(int argc, char* argv[])
     Player p(track.getStart());
 
     char pipetext[80]; // hacks
-	
+
     state = 2; // Preview
 
 	glMatrixMode(GL_MODELVIEW);
-	
+
 	if (debug) std::cout << "done." << std::endl;
-	
+
 	// Start the game loop
     while (App.IsOpened())
     {
+      float pos_z, pos_y, pos_x;
         if (state == 2)
         {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen
             glColor3f(1, 1, 1); // White
             glLoadIdentity();
-			
+
             gluLookAt(max + 100, 0, 0, 0, 0, 0, 0, 0, 1); 			// Look at the origin, from a large x distance away
             glRotatef((double)Clock.GetElapsedTime()/1000*30, 1, 0, 0);		// Rotate on all 3 axis at different speeds
             glRotatef((double)Clock.GetElapsedTime()/1000*40, 0, 1, 0);
@@ -178,7 +199,7 @@ int main(int argc, char* argv[])
             track.Render((double)App.GetFrameTime()/1000, 1.0); 				// Render the track all pretty and such
 
             App.Display();
-			
+
             // Process events
             sf::Event Event;
             while (App.PollEvent(Event))
@@ -220,7 +241,7 @@ int main(int argc, char* argv[])
 
                 if (Event.Type == sf::Event::Resized)
                     glViewport(0, 0, Event.Size.Width, Event.Size.Height);
-				
+
 				// Pause
 				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::P)
 				{
@@ -229,54 +250,88 @@ int main(int argc, char* argv[])
 				}
             }
 
-            if (sf::Keyboard::IsKeyPressed(p.controls[A])) {
+            if (!joystick)
+            {
+              if (sf::Keyboard::IsKeyPressed(p.controls[A])) {
                 p.rv.z = -1;
-            }
-            else if (sf::Keyboard::IsKeyPressed(p.controls[D])) {
+              }
+              else if (sf::Keyboard::IsKeyPressed(p.controls[D])) {
                 p.rv.z = 1;
-            }
-            else {
+              }
+              else {
                 p.rv.z = 0;
-            }
-            if (sf::Keyboard::IsKeyPressed(p.controls[Left])) {
+              }
+              if (sf::Keyboard::IsKeyPressed(p.controls[Left])) {
                 p.rv.y = 1;
-            }
-            else if (sf::Keyboard::IsKeyPressed(p.controls[Right])) {
+              }
+              else if (sf::Keyboard::IsKeyPressed(p.controls[Right])) {
                 p.rv.y = -1;
-            }
-            else {
+              }
+              else {
                 p.rv.y = 0;
-            }
-            if (sf::Keyboard::IsKeyPressed(p.controls[Up])) {
+              }
+              if (sf::Keyboard::IsKeyPressed(p.controls[Up])) {
                 p.rv.x = -1;
-            }
-            else if (sf::Keyboard::IsKeyPressed(p.controls[Down])) {
+              }
+              else if (sf::Keyboard::IsKeyPressed(p.controls[Down])) {
                 p.rv.x = 1;
-            }
-            else {
+              }
+              else {
                 p.rv.x = 0;
+              }
             }
-			
+            // otherwise use the joystick
+            else
+            {
+              pos_z = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::X);
+              pos_y = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::U);
+              pos_x = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::V);
+              if (abs(pos_z) > DEAD_ZONE)
+              {
+                p.rv.z = (pos_z / 100.f);
+              }
+              else
+              {
+                p.rv.z = 0;
+              }
+              if (abs(pos_y) > DEAD_ZONE)
+              {
+                p.rv.y = (pos_y / 100.f);
+              }
+              else
+              {
+                p.rv.y = 0;
+              }
+              if (abs(pos_x) > DEAD_ZONE)
+              {
+                p.rv.x = (pos_x / 100.f);
+              }
+              else
+              {
+                p.rv.x = 0;
+              }
+            }
+
 			float speed = 30 - p.trackDist(p.tp)*2;
             if (speed < 2) {
                 speed = 2;
             }
-			
+
             //------------
             // OPENGL
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			
+
             glLoadIdentity();
 
             // CAMERA
-			
+
 			// Set the camer position based on the ship's forward vector
 			// Here incremental values could be added to produce a 'soft' camera movement
 			// Currently the camera gets further away as speed increases
             float camx = p.r.x - p.forward.x*15 - p.forward.x*speed/5 + p.up.x*15; // No speed modifier on the 'up' term to make the camera be more behind the ship at high speed and less above it
             float camy = p.r.y - p.forward.y*15 - p.forward.y*speed/5 + p.up.y*15;
             float camz = p.r.z - p.forward.z*15 - p.forward.z*speed/5 + p.up.z*15;
-            
+
 			// Update the ships velocity based on the player's ability to not suck
             p.v.x = p.forward.x*speed;
             p.v.y = p.forward.y*speed;
@@ -332,7 +387,7 @@ int main(int argc, char* argv[])
 			if (Event.Type == sf::Event::Resized)
 				glViewport(0, 0, Event.Size.Width, Event.Size.Height);
 		}
-		
+
 		App.Display();
 	}
     }

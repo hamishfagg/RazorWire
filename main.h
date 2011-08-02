@@ -3,6 +3,8 @@
 
 
 bool debug;
+bool joystick;
+int joy_id;
 unsigned long seed;
 int state;
 /* STATES:

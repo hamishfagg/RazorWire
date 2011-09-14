@@ -113,20 +113,27 @@ int main(int argc, char* argv[])
         }
         if ((strcmp(argv[i], "-j") == 0) || (strcmp(argv[i], "--joystick") == 0))
         {
-          std::cout << "JOY" << std::endl;
           sf::Joystick::Update();
-          for (int i = 0; i < sf::Joystick::Count; i++)
+          for (int j = 0; j < sf::Joystick::Count; j++)
           {
-            if (sf::Joystick::IsConnected(i))
+            if (sf::Joystick::IsConnected(j))
             {
               joystick = true;
-              joy_id = i;
-              if (debug) std::cout << "Found joystick " << i << std::endl;
+              if (i+1 < argc)
+              {
+                if (strcmp(argv[i+1], "xbox") == 0)
+                {
+                  xbox = true;
+                  if (debug) std::cout << "xBox controller mode enabled." << std::endl;
+                }
+              }
+              joy_id = j;
+              if (debug) std::cout << "Found joystick " << j << std::endl;
               break;
             }
             else
             {
-              std::cout << i << " is not connected." << std::endl;
+              if (debug) std::cout << j << " is not connected." << std::endl;
             }
           }
         }
@@ -146,7 +153,7 @@ int main(int argc, char* argv[])
 
     sf::Clock Clock;
 
-	if (debug) std::cout << "Setting up graphics...";
+	if (debug) std::cout << "Setting up graphics... ";
     setupGraphics(); // Located above main()
 	if (debug) std::cout << "done." << std::endl;
 
@@ -159,7 +166,7 @@ int main(int argc, char* argv[])
 		time = Clock.GetElapsedTime() - time;
 		std::cout << "Level generated in " << time << " milliseconds." << std::endl;
 
-		std::cout << "Setting up track preview...";
+		std::cout << "Setting up track preview... ";
 	}
 	else
 	{
@@ -176,11 +183,11 @@ int main(int argc, char* argv[])
 
     state = 2; // Preview
 
-	glMatrixMode(GL_MODELVIEW);
+  glMatrixMode(GL_MODELVIEW);
 
-	if (debug) std::cout << "done." << std::endl;
+  if (debug) std::cout << "done." << std::endl;
 
-	// Start the game loop
+	  // Start the game loop
     while (App.IsOpened())
     {
       float pos_z, pos_y, pos_x;
@@ -283,9 +290,18 @@ int main(int argc, char* argv[])
             // otherwise use the joystick
             else
             {
-              pos_z = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::X);
-              pos_y = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::U);
-              pos_x = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::V);
+              if (xbox)
+              {
+                pos_x = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::V);
+                pos_y = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::U);
+                pos_z = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::X);
+              }
+              else
+              {
+                pos_x = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::Y);
+                pos_y = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::X);
+                pos_z = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::R);
+              }
               if (abs(pos_z) > DEAD_ZONE)
               {
                 p.rv.z = (pos_z / 100.f);

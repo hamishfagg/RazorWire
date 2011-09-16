@@ -2,6 +2,7 @@
 #define OBJECT_H_INCLUDED
 
 #include <iostream>
+#include <SFML/OpenGL.hpp>
 
 class Point {
 public:

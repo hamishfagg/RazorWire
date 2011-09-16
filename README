@@ -4,3 +4,7 @@ Razor Wire is a fun and simple game where you score points based on how close yo
 This is by no means finished - it was the product of a 48-hour game design competition that is now being worked on for fun.
 
 Read INSTALL for installation instructions.
+
+--SFML 2 version - ported by Thomas Phillips--
+
+Note: requires SFML 2 and OpenGL

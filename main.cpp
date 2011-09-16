@@ -13,6 +13,7 @@
 #include "Track.h"
 
 #define PI 3.14159265
+#define DEAD_ZONE 30
 
 
 // Returns n pipes in a string
@@ -20,9 +21,9 @@
 void getPipe(int n, char* s) {
     int i;
     for (i = 0; i < n; ++i) {
-        if (i < n) s[i] = '|';
+        s[i] = '|';
     }
-    s[i] = NULL;
+    s[i] = '\0';
 }
 
 // Sets up the graphics environment
@@ -86,7 +87,7 @@ void setupGraphics()
     gluPerspective(75.f, 1.f, 1.f, 1000.f); //This needs to be set to a shorter value after track preview
 }
 
-// Main method 
+// Main method
 // Should the main game loop  / operations be in it's own class to save this for arg parsing and stuff?
 int main(int argc, char* argv[])
 {
@@ -101,14 +102,40 @@ int main(int argc, char* argv[])
     {
         if (strcmp(argv[i], "--debug") == 0)
         {
-			std::cout << "DEBUG ENABLED: This could cause lower framerates than normal, and should NOT be used by default." << std::endl;
-            debug = true;
+          std::cout << "DEBUG ENABLED: This could cause lower framerates than normal, and should NOT be used by default." << std::endl;
+          debug = true;
         }
         if (strcmp(argv[i], "-s") == 0)
         {
             i++;
             seed = coll.hash(argv[i], argv[i]+strlen(argv[i]));
-			if (debug) std::cout << "Seeding with " << seed << "..." << std::endl;
+            if (debug) std::cout << "Seeding with " << seed << "..." << std::endl;
+        }
+        if ((strcmp(argv[i], "-j") == 0) || (strcmp(argv[i], "--joystick") == 0))
+        {
+          sf::Joystick::Update();
+          for (int j = 0; j < sf::Joystick::Count; j++)
+          {
+            if (sf::Joystick::IsConnected(j))
+            {
+              joystick = true;
+              if (i+1 < argc)
+              {
+                if (strcmp(argv[i+1], "xbox") == 0)
+                {
+                  xbox = true;
+                  if (debug) std::cout << "xBox controller mode enabled." << std::endl;
+                }
+              }
+              joy_id = j;
+              if (debug) std::cout << "Found joystick " << j << std::endl;
+              break;
+            }
+            else
+            {
+              if (debug) std::cout << j << " is not connected." << std::endl;
+            }
+          }
         }
     }
 
@@ -120,12 +147,13 @@ int main(int argc, char* argv[])
 
     // Create the main window
     sf::RenderWindow App(sf::VideoMode(1000, 1000, 32), "Razor Wire");
-    //App.UseVerticalSync(true);
-    App.PreserveOpenGLStates(true);
+
+    //App.EnableVerticalSync(true);
+    //App.SetFramerateLimit(60);
 
     sf::Clock Clock;
 
-	if (debug) std::cout << "Setting up graphics...";
+	if (debug) std::cout << "Setting up graphics... ";
     setupGraphics(); // Located above main()
 	if (debug) std::cout << "done." << std::endl;
 
@@ -136,9 +164,9 @@ int main(int argc, char* argv[])
 		double time = Clock.GetElapsedTime();
 		track.GenChunk(TRACK_LENGTH);
 		time = Clock.GetElapsedTime() - time;
-		std::cout << "Level generated in " << time << " seconds." << std::endl;
-		
-		std::cout << "Setting up track preview...";
+		std::cout << "Level generated in " << time << " milliseconds." << std::endl;
+
+		std::cout << "Setting up track preview... ";
 	}
 	else
 	{
@@ -151,45 +179,45 @@ int main(int argc, char* argv[])
     // Initialise player
     Player p(track.getStart());
 
-    const sf::Input &in = App.GetInput();
     char pipetext[80]; // hacks
-	
+
     state = 2; // Preview
 
-	glMatrixMode(GL_MODELVIEW);
-	
-	if (debug) std::cout << "done." << std::endl;
-	
-	// Start the game loop
+  glMatrixMode(GL_MODELVIEW);
+
+  if (debug) std::cout << "done." << std::endl;
+
+	  // Start the game loop
     while (App.IsOpened())
     {
+      float pos_z, pos_y, pos_x;
         if (state == 2)
         {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen
             glColor3f(1, 1, 1); // White
             glLoadIdentity();
-			
+
             gluLookAt(max + 100, 0, 0, 0, 0, 0, 0, 0, 1); 			// Look at the origin, from a large x distance away
-            glRotatef(Clock.GetElapsedTime()*30, 1, 0, 0);		// Rotate on all 3 axis at different speeds
-            glRotatef(Clock.GetElapsedTime()*40, 0, 1, 0);
-            glRotatef(Clock.GetElapsedTime()*50, 0, 0, 1);
+            glRotatef((double)Clock.GetElapsedTime()/1000*30, 1, 0, 0);		// Rotate on all 3 axis at different speeds
+            glRotatef((double)Clock.GetElapsedTime()/1000*40, 0, 1, 0);
+            glRotatef((double)Clock.GetElapsedTime()/1000*50, 0, 0, 1);
             glTranslatef(-trackAvg.x, -trackAvg.y, -trackAvg.z);	// Translate the avg track pos
 
-            track.Render(App.GetFrameTime(), 1.0); 				// Render the track all pretty and such
+            track.Render((double)App.GetFrameTime()/1000, 1.0); 				// Render the track all pretty and such
 
             App.Display();
-			
+
             // Process events
             sf::Event Event;
-            while (App.GetEvent(Event))
+            while (App.PollEvent(Event))
             {
                 // Close window : exit
                 if ((Event.Type == sf::Event::Closed) |
-                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Escape))
+                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Escape))
                     App.Close();
 
                 // Start track
-				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Return)
+				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Return)
                     state = 3;
 
                 if (Event.Type == sf::Event::Resized)
@@ -203,80 +231,123 @@ int main(int argc, char* argv[])
             // hack alert
             char s[80];
             getPipe(20 - p.trackDist(p.tp), pipetext);
-            if (debug)	sprintf(s, "%f\n%i\n%s", 1/App.GetFrameTime(), (int)p.score, pipetext); // Add a frame rate counter if we're in debug mode
+            if (debug)	sprintf(s, "%f\n%i\n%s", 1/((double)App.GetFrameTime()/1000), (int)p.score, pipetext); // Add a frame rate counter if we're in debug mode
 			else			sprintf(s, "%i\n%s", (int)p.score, pipetext);
-            sf::String Text(s);
+            sf::Text Text(s);
 
             Text.SetColor(sf::Color(255,255,255));
 
             // Process events
             sf::Event Event;
-            while (App.GetEvent(Event))
+            while (App.PollEvent(Event))
             {
                 // Close window : exit
                 if ((Event.Type == sf::Event::Closed) |
-                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Escape))
+                    (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Escape))
                     App.Close();
 
                 if (Event.Type == sf::Event::Resized)
                     glViewport(0, 0, Event.Size.Width, Event.Size.Height);
-				
+
 				// Pause
-				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::P)
+				if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::P)
 				{
 					state = 4;
 					if (debug) std::cout << "The game has been paused." << std::endl;
 				}
             }
 
-            if (in.IsKeyDown(p.controls[A])) {
+            if (!joystick)
+            {
+              if (sf::Keyboard::IsKeyPressed(p.controls[A])) {
                 p.rv.z = -1;
-            }
-            else if (in.IsKeyDown(p.controls[D])) {
+              }
+              else if (sf::Keyboard::IsKeyPressed(p.controls[D])) {
                 p.rv.z = 1;
-            }
-            else {
+              }
+              else {
                 p.rv.z = 0;
-            }
-            if (in.IsKeyDown(p.controls[Left])) {
+              }
+              if (sf::Keyboard::IsKeyPressed(p.controls[Left])) {
                 p.rv.y = 1;
-            }
-            else if (in.IsKeyDown(p.controls[Right])) {
+              }
+              else if (sf::Keyboard::IsKeyPressed(p.controls[Right])) {
                 p.rv.y = -1;
-            }
-            else {
+              }
+              else {
                 p.rv.y = 0;
-            }
-            if (in.IsKeyDown(p.controls[Up])) {
+              }
+              if (sf::Keyboard::IsKeyPressed(p.controls[Up])) {
                 p.rv.x = -1;
-            }
-            else if (in.IsKeyDown(p.controls[Down])) {
+              }
+              else if (sf::Keyboard::IsKeyPressed(p.controls[Down])) {
                 p.rv.x = 1;
-            }
-            else {
+              }
+              else {
                 p.rv.x = 0;
+              }
             }
-			
+            // otherwise use the joystick
+            else
+            {
+              if (xbox)
+              {
+                pos_x = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::V);
+                pos_y = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::U);
+                pos_z = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::X);
+              }
+              else
+              {
+                pos_x = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::Y);
+                pos_y = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::X);
+                pos_z = sf::Joystick::GetAxisPosition(joy_id, sf::Joystick::R);
+              }
+              if (abs(pos_z) > DEAD_ZONE)
+              {
+                p.rv.z = (pos_z / 100.f);
+              }
+              else
+              {
+                p.rv.z = 0;
+              }
+              if (abs(pos_y) > DEAD_ZONE)
+              {
+                p.rv.y = (pos_y / 100.f);
+              }
+              else
+              {
+                p.rv.y = 0;
+              }
+              if (abs(pos_x) > DEAD_ZONE)
+              {
+                p.rv.x = (pos_x / 100.f);
+              }
+              else
+              {
+                p.rv.x = 0;
+              }
+            }
+
 			float speed = 30 - p.trackDist(p.tp)*2;
             if (speed < 2) {
                 speed = 2;
             }
-			
+
             //------------
             // OPENGL
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			
+
             glLoadIdentity();
 
             // CAMERA
-			
+
 			// Set the camer position based on the ship's forward vector
 			// Here incremental values could be added to produce a 'soft' camera movement
 			// Currently the camera gets further away as speed increases
             float camx = p.r.x - p.forward.x*15 - p.forward.x*speed/5 + p.up.x*15; // No speed modifier on the 'up' term to make the camera be more behind the ship at high speed and less above it
             float camy = p.r.y - p.forward.y*15 - p.forward.y*speed/5 + p.up.y*15;
             float camz = p.r.z - p.forward.z*15 - p.forward.z*speed/5 + p.up.z*15;
-            
+
 			// Update the ships velocity based on the player's ability to not suck
             p.v.x = p.forward.x*speed;
             p.v.y = p.forward.y*speed;
@@ -300,10 +371,12 @@ int main(int argc, char* argv[])
                 glVertex3f(p.r.x, p.r.y, p.r.z);
             glEnd();
 
-            track.Render(App.GetFrameTime(), 0.2); // Render track and player
-            p.Render(App.GetFrameTime());
+            track.Render((double)App.GetFrameTime()/1000, 0.2); // Render track and player
+            p.Render((double)App.GetFrameTime()/1000);
 
+            App.SaveGLStates();
             App.Draw(Text);	// Draw HUD text
+            App.RestoreGLStates();
 
             //------------
 
@@ -313,15 +386,15 @@ int main(int argc, char* argv[])
 	else if (state == 4) // Game is paused
 	{
 		sf::Event Event;
-		while (App.GetEvent(Event))
+		while (App.PollEvent(Event))
 		{
 			// Close window : exit
 			if ((Event.Type == sf::Event::Closed) |
-				(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Escape))
+				(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::Escape))
 				App.Close();
 
 			// Unpause
-			if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::P)
+			if (Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Keyboard::P)
 			{
 				state = 3;
 				if (debug) std::cout << "The game has been resumed." << std::endl;
@@ -330,7 +403,7 @@ int main(int argc, char* argv[])
 			if (Event.Type == sf::Event::Resized)
 				glViewport(0, 0, Event.Size.Width, Event.Size.Height);
 		}
-		
+
 		App.Display();
 	}
     }

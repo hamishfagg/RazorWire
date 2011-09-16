@@ -1,7 +1,9 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 
+#include <deque>
 #include <SFML/Window.hpp>
+#include <SFML/OpenGL.hpp>
 #include "Object.h"
 
 enum control_list {W, S, A, D, Up, Down, Left, Right};
@@ -22,8 +24,8 @@ public:
     void Render(float);
     double score;
     // Controls (Follows control_list order)
-    sf::Key::Code GetControls(control_list);
-    sf::Key::Code controls[8];
+    sf::Keyboard::Key GetControls(control_list);
+    sf::Keyboard::Key controls[8];
 private:
 
 };

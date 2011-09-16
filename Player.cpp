@@ -2,14 +2,14 @@
 #include <math.h>
 
 
-Player::Player(std::deque<Point>::reverse_iterator tp) : controls({sf::Key::W,
-                             sf::Key::S,
-                             sf::Key::A,
-                             sf::Key::D,
-                             sf::Key::Up,
-                             sf::Key::Down,
-                             sf::Key::Left,
-                             sf::Key::Right,}),
+Player::Player(std::deque<Point>::reverse_iterator tp) : controls({sf::Keyboard::W,
+                             sf::Keyboard::S,
+                             sf::Keyboard::A,
+                             sf::Keyboard::D,
+                             sf::Keyboard::Up,
+                             sf::Keyboard::Down,
+                             sf::Keyboard::Left,
+                             sf::Keyboard::Right,}),
                              tp(tp)
 {
     score = 0;

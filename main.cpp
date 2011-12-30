@@ -84,7 +84,7 @@ void setupGraphics()
     // Setup a perspective projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(75.f, 1.f, 1.f, 1000.f); //This needs to be set to a shorter value after track preview
+    gluPerspective(75.f, 1.f, 1.f, 200.f);
 }
 
 // Main method
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
     srand (seed);
 
     // Create the main window
-    sf::RenderWindow App(sf::VideoMode(1000, 1000, 32), "Razor Wire");
+    sf::RenderWindow App(sf::VideoMode(640, 480, 32), "Razor Wire");
 
     //App.EnableVerticalSync(true);
     //App.SetFramerateLimit(60);
@@ -197,12 +197,12 @@ int main(int argc, char* argv[])
             glColor3f(1, 1, 1); // White
             glLoadIdentity();
 
-            gluLookAt(max + 100, 0, 0, 0, 0, 0, 0, 0, 1); 			// Look at the origin, from a large x distance away
+            gluLookAt(50, 0, 0, 0, 0, 0, 0, 0, 1); 			// Look at the origin, from a large x distance away
             glRotatef((double)Clock.GetElapsedTime()/1000*30, 1, 0, 0);		// Rotate on all 3 axis at different speeds
             glRotatef((double)Clock.GetElapsedTime()/1000*40, 0, 1, 0);
             glRotatef((double)Clock.GetElapsedTime()/1000*50, 0, 0, 1);
+            glScalef(0.05, 0.05, 0.05);
             glTranslatef(-trackAvg.x, -trackAvg.y, -trackAvg.z);	// Translate the avg track pos
-
             track.Render((double)App.GetFrameTime()/1000, 1.0); 				// Render the track all pretty and such
 
             App.Display();

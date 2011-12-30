@@ -1,5 +1,5 @@
 RazorWire: main.o Object.o Player.o Track.o
-	g++ main.o Object.o Player.o Track.o -o RazorWire -lsfml-graphics -lsfml-window -lsfml-system -lGLU
+	g++ main.o Object.o Player.o Track.o -o RazorWire -lsfml-graphics -lsfml-window -lsfml-system -lGLU -lGL
 
 main.o: main.cpp main.h
 	g++ -c main.cpp

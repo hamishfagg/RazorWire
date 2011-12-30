@@ -2,7 +2,7 @@
 
 These aren't actually installation instructions since no install target is in the makefile yet - joke's on you.
 
-Razor Wire depends on OpenGL and SMFL1.6 - Be careful, some distributions have SFML1.99 as the default, and you may have to get SFML from the website.
+Razor Wire depends on OpenGL and SMFL2 - Some linux distros may have SFML1.6 as default.
 CURRENTLY ONLY TESTED ON LINUX. That being said, the code doesnt contain any OS specific stuff as far as I can tell. This should compile on other systems.
 If it doesn't, please tell us on the github page or email mystx@chaostheory.co.nz
 

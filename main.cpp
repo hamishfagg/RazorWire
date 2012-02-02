@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
 
     // Create the main window
     sf::RenderWindow App(sf::VideoMode(1000, 650, 32), "Razor Wire");
-	/*Gwen::Renderer::SFML GwenRenderer(App);
+	Gwen::Renderer::SFML GwenRenderer(App);
 
 	// Create a Gwen skin
 	Gwen::Skin::TexturedBase skin;
@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
     //App.EnableVerticalSync(true);
     //App.SetFramerateLimit(60);
 	Gwen::Input::SFML GwenInput;
-	GwenInput.Initialize( pCanvas );*/
+	GwenInput.Initialize( pCanvas );
 
     sf::Clock Clock;
 
@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
 			// Enable Z-buffer read and write
 		    //glEnable(GL_DEPTH_TEST);
     		//glDepthMask(GL_TRUE);;
-			//pCanvas->RenderCanvas();
+			pCanvas->RenderCanvas();
 
 
             gluLookAt(50, 0, 0, 0, 0, 0, 0, 0, 1); 			// Look at the origin, from a large x distance away
@@ -263,7 +263,7 @@ int main(int argc, char* argv[])
 
                 if (Event.Type == sf::Event::Resized)
                     glViewport(0, 0, Event.Size.Width, Event.Size.Height);
-				//GwenInput.ProcessMessage(Event);
+				GwenInput.ProcessMessage(Event);
             }
 
         }

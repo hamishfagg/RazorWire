@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/155/trunk/trunk/gwen/include/Gwen/Input
+END
+Windows.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/61/trunk/trunk/gwen/include/Gwen/Input/Windows.h
+END
+SFML.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/52/trunk/trunk/gwen/include/Gwen/Input/SFML.h
+END
+Allegro.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/155/trunk/trunk/gwen/include/Gwen/Input/Allegro.h
+END
+SDL13.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/52/trunk/trunk/gwen/include/Gwen/Input/SDL13.h
+END

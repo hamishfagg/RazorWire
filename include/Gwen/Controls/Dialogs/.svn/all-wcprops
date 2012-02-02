@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/52/trunk/trunk/gwen/include/Gwen/Controls/Dialogs
+END
+FileSave.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/52/trunk/trunk/gwen/include/Gwen/Controls/Dialogs/FileSave.h
+END
+FileOpen.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/52/trunk/trunk/gwen/include/Gwen/Controls/Dialogs/FileOpen.h
+END
+Query.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/52/trunk/trunk/gwen/include/Gwen/Controls/Dialogs/Query.h
+END

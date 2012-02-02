@@ -1,14 +1,20 @@
-RazorWire: main.o Object.o Player.o Track.o
-	g++ main.o Object.o Player.o Track.o -o RazorWire -lsfml-graphics -lsfml-window -lsfml-system -lGLU -lGL
+CC=g++
 
-main.o: main.cpp main.h
-	g++ -c main.cpp
+OBJDIR 		= obj
+TARGETDIR 	= bin
+TARGET 		= $(TARGETDIR)/RazorWire
+INCLUDES   += -Iinclude
+LDFLAGS    += -Llib/linux -Llib
+LIBS 	   += lib/linux/libunittest.a lib/linux/libGWEN-Renderer-SFML.a lib/linux/libgwen_static.a -lGL -lsfml-window -lsfml-graphics -lsfml-system
+SOURCES		= main.cpp Player.cpp Object.cpp Track.cpp
+CFLAGS=-c -Wall -fno-rtti
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=RazorWire
 
-Object.o: Object.cpp Object.h
-	g++ -c Object.cpp
+all: $(SOURCES) $(EXECUTABLE)
+	
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) -o $(TARGET) $(LDFLAGS) $(OBJECTS) $(LIBS)
 
-Player.o: Player.cpp Player.h
-	g++ -c Player.cpp
-
-Track.o: Track.cpp Track.h
-	g++ -c Track.cpp
+.cpp.o:
+	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@

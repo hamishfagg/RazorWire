@@ -2,6 +2,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 
+#include "Gwen/Renderers/SFML.h"
+#include "Gwen/Input/SFML.h"
+
+#include "Gwen/Skins/Simple.h"
+#include "Gwen/Skins/TexturedBase.h"
+#include "Gwen/UnitTest/UnitTest.h"
+
 #include <cstdio>   // Hack for sprintf
 #include <iostream>
 #include <cstring>
@@ -63,14 +70,14 @@ void setupGraphics()
 
 
     //Attempt at getting fog to work
-    GLfloat fogcolor[4] = {1, 1, 1, 1};
+	/*GLfloat fogcolor[4] = {1, 1, 1, 1};
     //glEnable(GL_FOG);
     glFogi(GL_FOG_MODE, GL_EXP);
     glFogfv(GL_FOG_COLOR, fogcolor);
     glFogf (GL_FOG_DENSITY, 0.35);
     //glHint (GL_FOG_HINT, GL_DONT_CARE);
     glFogf (GL_FOG_START, 1.0);
-    glFogf (GL_FOG_END, 6.0);
+    glFogf (GL_FOG_END, 6.0);*/
 
 
     // Set color and depth clear value
@@ -78,8 +85,8 @@ void setupGraphics()
     glClearColor(0.f, 0.f, 0.f, 0.f);
 
     // Enable Z-buffer read and write
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
+    //glDisable(GL_DEPTH_TEST);
+    //glDepthMask(GL_TRUE);
 
     // Setup a perspective projection
     glMatrixMode(GL_PROJECTION);
@@ -146,12 +153,34 @@ int main(int argc, char* argv[])
     srand (seed);
 
     // Create the main window
-    sf::RenderWindow App(sf::VideoMode(640, 480, 32), "Razor Wire");
+    sf::RenderWindow App(sf::VideoMode(1000, 650, 32), "Razor Wire");
+	/*Gwen::Renderer::SFML GwenRenderer(App);
+
+	// Create a Gwen skin
+	Gwen::Skin::TexturedBase skin;
+	skin.SetRender(&GwenRenderer);
+	skin.Init("DefaultSkin.png");
+
+	// Force local font
+	skin.SetDefaultFont(L"OpenSans.ttf", 11);
+
+	//
+	// Create a Canvas (it's root, on which all other GWEN panels are created)
+	//
+	Gwen::Controls::Canvas* pCanvas = new Gwen::Controls::Canvas( &skin );
+	pCanvas->SetSize( App.GetWidth(), App.GetHeight() );
+	pCanvas->SetDrawBackground( true );
+	pCanvas->SetBackgroundColor( Gwen::Color( 150, 170, 170, 100 ) );
+
+	UnitTest* pUnit = new UnitTest(pCanvas);
 
     //App.EnableVerticalSync(true);
     //App.SetFramerateLimit(60);
+	Gwen::Input::SFML GwenInput;
+	GwenInput.Initialize( pCanvas );*/
 
     sf::Clock Clock;
+
 
 	if (debug) std::cout << "Setting up graphics... ";
     setupGraphics(); // Located above main()
@@ -193,9 +222,21 @@ int main(int argc, char* argv[])
       float pos_z, pos_y, pos_x;
         if (state == 2)
         {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen
-            glColor3f(1, 1, 1); // White
-            glLoadIdentity();
+			App.Clear();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen
+            glColor4f(1, 1, 1, 1); // White
+			glLoadIdentity();
+
+			// Disable Z-buffer read and write
+    		//glDisable(GL_DEPTH_TEST);
+    		//glDepthMask(GL_FALSE);
+
+
+			// Enable Z-buffer read and write
+		    //glEnable(GL_DEPTH_TEST);
+    		//glDepthMask(GL_TRUE);;
+			//pCanvas->RenderCanvas();
+
 
             gluLookAt(50, 0, 0, 0, 0, 0, 0, 0, 1); 			// Look at the origin, from a large x distance away
             glRotatef((double)Clock.GetElapsedTime()/1000*30, 1, 0, 0);		// Rotate on all 3 axis at different speeds
@@ -222,6 +263,7 @@ int main(int argc, char* argv[])
 
                 if (Event.Type == sf::Event::Resized)
                     glViewport(0, 0, Event.Size.Width, Event.Size.Height);
+				//GwenInput.ProcessMessage(Event);
             }
 
         }
